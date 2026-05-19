@@ -121,11 +121,11 @@ document.getElementById('reservation-form').addEventListener('submit', async (e)
         });
         
         const message = document.getElementById('form-message');
-        if(response.ok) {
-            message.style.color = 'green';
-            message.innerText = "🎉 Table booked successfully! Check your database.";
-            e.target.reset();
-        } else {
+        // Frontend fetch request के बाद:
+if (response.ok) {
+    const data = await response.json();
+    document.getElementById('success-message').innerText = data.message; 
+} else {
             message.style.color = 'red';
             message.innerText = "Error booking table. Please try again.";
         }

@@ -5,6 +5,7 @@ const reservationSchema = new mongoose.Schema({
     email: { type: String, required: true },
     date: { type: String, required: true },
     guests: { type: Number, required: true },
+    tableNumber: { type: Number }, // 👉 बस यह नई लाइन ऐड हुई है
     createdAt: { type: Date, default: Date.now }
 });
 
