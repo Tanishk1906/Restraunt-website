@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://restraunt-website-xeqg.onrender.com/api';
 
 // 1. Fetch and Display Menu
 async function fetchMenu() {
