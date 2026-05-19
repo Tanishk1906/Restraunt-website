@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-
+console.log("Is API Key loaded?", process.env.GEMINI_API_KEY ? "Yes ✅" : "No ❌");
 const app = express();
 
 // Middleware
