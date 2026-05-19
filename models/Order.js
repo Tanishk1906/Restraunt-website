@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
         quantity: Number
     }],
     totalAmount: { type: Number, required: true },
-    status: { type: String, default: 'Preparing' }, // Preparing, Served, Paid
+    status: { type: String, default: 'Preparing' },
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -202,10 +202,13 @@ async function placeOrder() {
         return;
     }
 
+    // कुल अमाउंट को एक variable में ले लिया
+    const finalAmount = parseInt(document.getElementById('total-amount').innerText);
+
     const orderData = {
         tableNumber: parseInt(tableNumber),
         items: cart,
-        totalAmount: parseInt(document.getElementById('total-amount').innerText)
+        totalAmount: finalAmount
     };
 
     try {
@@ -218,18 +221,22 @@ async function placeOrder() {
 
         const message = document.getElementById('order-message');
         if (response.ok) {
+            // 🌟 यहाँ हमने आपका नया Pop-up Box (Alert) जोड़ दिया है 🌟
+            alert(`✅ Your order is being placed!\n\nPlease pay your specified bill amount: ₹${finalAmount}`);
+
             message.style.color = 'green';
             message.innerText = "🍽️ Order sent to kitchen! Please wait at your table.";
+            
             // Clear cart
             cart = [];
             updateCartUI();
             document.getElementById('table-number').value = '';
             
-            // Auto close modal after 3 seconds
+            // Popup बंद करने के बाद Modal को अपने आप बंद कर देगा
             setTimeout(() => {
                 toggleCart();
                 message.innerText = '';
-            }, 3000);
+            }, 1000);
         } else {
             message.style.color = 'red';
             message.innerText = "Error placing order.";
