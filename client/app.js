@@ -53,59 +53,98 @@ const fullMenu = {
     }
 };
 
-// Function to handle tab switching and rendering
+// ==========================================
+// 🌟 UI HELPER: TOAST NOTIFICATIONS
+// ==========================================
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+    
+    toast.innerHTML = `${icon} <span>${message}</span>`;
+    container.appendChild(toast);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ==========================================
+// 🍽️ MENU LOGIC
+// ==========================================
 function openMenu(evt, mealTime) {
-    // Remove active class from all buttons
+    // Tab switching visual logic
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    // Add active class to clicked button
     evt.currentTarget.classList.add('active');
 
     const menuContainer = document.getElementById('menu-content');
-    menuContainer.innerHTML = ''; // Clear old content
-    menuContainer.style.opacity = 0; // Animation start
+    
+    // Fade out effect
+    menuContainer.style.opacity = 0;
 
-    const mealData = fullMenu[mealTime];
-
-    // Loop through sub-categories (Starters, Food, Drinks)
-    for (const [subCategory, items] of Object.entries(mealData)) {
-        // Create Section Title
-        const subTitle = document.createElement('h3');
-        subTitle.className = 'sub-category-title';
-        subTitle.innerText = subCategory;
-        menuContainer.appendChild(subTitle);
-
-        // Create Grid for items
-        const grid = document.createElement('div');
-        grid.className = 'menu-grid';
-
-        // Add items to grid
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'menu-card';
-            card.innerHTML = `
-                <h3>${item.name}</h3>
-                <p>${item.desc}</p>
-                <span class="price-tag">₹${item.price}</span>
-                <button class="add-to-cart-btn" onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
-            `;
-            grid.appendChild(card);
-        });
-
-        menuContainer.appendChild(grid);
-    }
-
-    // Fade-in animation effect
     setTimeout(() => {
-        menuContainer.style.transition = "opacity 0.4s ease-in-out";
+        menuContainer.innerHTML = ''; 
+        const mealData = fullMenu[mealTime];
+
+        if (!mealData) return;
+
+        // Loop through sub-categories
+        for (const [subCategory, items] of Object.entries(mealData)) {
+            // Section Title
+            const subTitle = document.createElement('h3');
+            subTitle.className = 'sub-category-title';
+            subTitle.innerText = subCategory;
+            menuContainer.appendChild(subTitle);
+
+            // Grid
+            const grid = document.createElement('div');
+            grid.className = 'menu-grid';
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'menu-card';
+                card.innerHTML = `
+                    <h3>${item.name}</h3>
+                    <p>${item.desc}</p>
+                    <span class="price-tag">₹${item.price}</span>
+                    <button class="add-to-cart-btn" onclick="addToCart('${item.name}', ${item.price})">
+                        <i class="fas fa-plus"></i> Add to Cart
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+            menuContainer.appendChild(grid);
+        }
+        
+        // Fade in
         menuContainer.style.opacity = 1;
-    }, 50);
+    }, 300);
 }
 
-// Handle Reservation Submission with Live Backend
+// Load Breakfast by default
+document.addEventListener("DOMContentLoaded", () => {
+    const firstTab = document.querySelector('.tab-btn');
+    if(firstTab) {
+        openMenu({ currentTarget: firstTab }, 'Breakfast');
+    }
+});
+
+// ==========================================
+// 📅 RESERVATION LOGIC
+// ==========================================
 document.getElementById('reservation-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const RESERVATION_API = 'https://restraunt-website-xeqg.onrender.com/api/reservation';
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
     
+    // Loading state
+    btn.innerText = "Booking...";
+    btn.disabled = true;
+
     const formData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
@@ -114,40 +153,34 @@ document.getElementById('reservation-form').addEventListener('submit', async (e)
     };
 
     try {
-        const response = await fetch(RESERVATION_API, {
+        const response = await fetch(`${API_URL}/reservation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
         
-        const message = document.getElementById('form-message');
-        // Frontend fetch request के बाद:
-if (response.ok) {
-    const data = await response.json();
-    document.getElementById('success-message').innerText = data.message; 
-} else {
-            message.style.color = 'red';
-            message.innerText = "Error booking table. Please try again.";
+        if (response.ok) {
+            const data = await response.json();
+            showToast(data.message || "Table booked successfully!", "success");
+            document.getElementById('reservation-form').reset();
+        } else {
+            showToast("Failed to book table. Please try again.", "error");
         }
     } catch (err) {
-        console.error("Booking error:", err);
+        console.error(err);
+        showToast("Network error. Check connection.", "error");
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
     }
 });
 
-// Load Breakfast by default when page loads
-document.addEventListener("DOMContentLoaded", () => {
-    const firstTab = document.querySelector('.tab-btn');
-    if(firstTab) {
-        openMenu({ currentTarget: firstTab }, 'Breakfast');
-    }
-});
 // ==========================================
-// 🛒 DIGITAL WAITER / CART LOGIC
+// 🛒 CART LOGIC
 // ==========================================
 let cart = [];
 
 function addToCart(name, price) {
-    // Check if item already in cart
     const existingItem = cart.find(item => item.name === name);
     if (existingItem) {
         existingItem.quantity += 1;
@@ -155,9 +188,7 @@ function addToCart(name, price) {
         cart.push({ name, price, quantity: 1 });
     }
     updateCartUI();
-    
-    // Optional: Small alert or toast
-    alert(`Added ${name} to cart!`);
+    showToast(`${name} added to cart!`);
 }
 
 function updateCartUI() {
@@ -165,20 +196,28 @@ function updateCartUI() {
     const cartCount = document.getElementById('cart-count');
     const totalAmountElem = document.getElementById('total-amount');
     
-    cartItemsContainer.innerHTML = ''; // Clear current
+    cartItemsContainer.innerHTML = ''; 
     let total = 0;
     let count = 0;
 
-    cart.forEach((item, index) => {
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p class="empty-cart-msg">Your cart is currently empty.</p>';
+    }
+
+    cart.forEach((item) => {
         total += (item.price * item.quantity);
         count += item.quantity;
         
-        cartItemsContainer.innerHTML += `
-            <div class="cart-item">
-                <span>${item.name} x ${item.quantity}</span>
-                <span>₹${item.price * item.quantity}</span>
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+            <div>
+                <strong>${item.name}</strong><br>
+                <small>₹${item.price} x ${item.quantity}</small>
             </div>
+            <strong>₹${item.price * item.quantity}</strong>
         `;
+        cartItemsContainer.appendChild(div);
     });
 
     cartCount.innerText = count;
@@ -190,20 +229,30 @@ function toggleCart() {
     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
 }
 
+// Close modal if clicked outside
+window.onclick = function(event) {
+    const modal = document.getElementById('cart-modal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
 async function placeOrder() {
     if (cart.length === 0) {
-        alert("Your cart is empty!");
+        showToast("Your cart is empty!", "error");
         return;
     }
     
     const tableNumber = document.getElementById('table-number').value;
     if (!tableNumber) {
-        alert("Please enter your table number!");
+        showToast("Please enter your table number!", "error");
         return;
     }
 
-    // कुल अमाउंट को एक variable में ले लिया
     const finalAmount = parseInt(document.getElementById('total-amount').innerText);
+    const orderBtn = document.querySelector('.order-btn');
+    
+    orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
     const orderData = {
         tableNumber: parseInt(tableNumber),
@@ -212,36 +261,43 @@ async function placeOrder() {
     };
 
     try {
-        const ORDER_API = 'https://restraunt-website-xeqg.onrender.com/api/order';
-        const response = await fetch(ORDER_API, {
+        const response = await fetch(`${API_URL}/order`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData)
         });
 
-        const message = document.getElementById('order-message');
         if (response.ok) {
-            // 🌟 यहाँ हमने आपका नया Pop-up Box (Alert) जोड़ दिया है 🌟
-            alert(`✅ Your order is being placed!\n\nPlease pay your specified bill amount: ₹${finalAmount}`);
-
-            message.style.color = 'green';
-            message.innerText = "🍽️ Order sent to kitchen! Please wait at your table.";
-            
-            // Clear cart
+            showToast(`Order placed for Table ${tableNumber}! Total: ₹${finalAmount}`, "success");
             cart = [];
             updateCartUI();
             document.getElementById('table-number').value = '';
-            
-            // Popup बंद करने के बाद Modal को अपने आप बंद कर देगा
-            setTimeout(() => {
-                toggleCart();
-                message.innerText = '';
-            }, 1000);
+            setTimeout(toggleCart, 1500);
         } else {
-            message.style.color = 'red';
-            message.innerText = "Error placing order.";
+            showToast("Error placing order.", "error");
         }
     } catch (error) {
-        console.error("Order error:", error);
+        console.error(error);
+        showToast("Connection failed.", "error");
+    } finally {
+        orderBtn.innerHTML = 'Place Order <i class="fas fa-paper-plane"></i>';
+    }
+}
+
+// Mobile Menu Toggle (Simple implementation)
+function toggleMobileMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks.style.display === 'flex') {
+        navLinks.style.display = 'none';
+    } else {
+        navLinks.style.display = 'flex';
+        navLinks.style.flexDirection = 'column';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '70px';
+        navLinks.style.right = '0';
+        navLinks.style.background = 'white';
+        navLinks.style.width = '100%';
+        navLinks.style.padding = '20px';
+        navLinks.style.boxShadow = '0 5px 10px rgba(0,0,0,0.1)';
     }
 }
