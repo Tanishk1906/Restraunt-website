@@ -287,3 +287,41 @@ body {
     width: 100%;
     font-size: 1.1rem;
 }
+/* ==========================================
+   ABOUT SECTION STYLES
+   ========================================== */
+.about-section {
+    padding: 60px 20px;
+    background-color: #fffaf0; /* हल्की वार्म/देसी वाइब के लिए */
+    text-align: center;
+    border-top: 2px dashed #f0a500;
+    border-bottom: 2px dashed #f0a500;
+    margin: 40px 0;
+}
+
+.about-section h2 {
+    font-size: 2.5rem;
+    color: #d35400; /* डार्क ऑरेंज */
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.about-text strong {
+    color: #d35400;
+}
