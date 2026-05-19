@@ -1,8 +1,14 @@
+const express = require('express');
+const router = express.Router();
+const Reservation = require('../models/Reservation'); // डेटाबेस मॉडल को बुलाना ज़रूरी है
+
+// POST route - नई बुकिंग करने के लिए
 router.post('/', async (req, res) => {
     try {
-        // 1 से 20 के बीच रैंडम टेबल नंबर
+        // 1 से 20 के बीच रैंडम टेबल नंबर जनरेट करें
         const assignedTable = Math.floor(Math.random() * 20) + 1;
 
+        // डेटाबेस में सेव करें
         const newReservation = new Reservation({
             name: req.body.name,
             email: req.body.email,
@@ -13,7 +19,7 @@ router.post('/', async (req, res) => {
 
         const savedReservation = await newReservation.save();
         
-        // यह नया मैसेज होना बहुत ज़रूरी है
+        // यह नया मैसेज Frontend को भेजें
         res.status(201).json({ 
             message: `Table booked successfully! 🥳 Your Table Number is: ${assignedTable}` 
         });
@@ -21,3 +27,5 @@ router.post('/', async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
+
+module.exports = router; // फाइल को बाहर भेजने के लिए यह लाइन ज़रूरी है
