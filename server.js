@@ -19,7 +19,11 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes import
 const menuRoutes = require('./routes/menu');
 const reservationRoutes = require('./routes/reservation');
+// Routes import (Add this with existing imports)
+const orderRoutes = require('./routes/order');
 
+// Use Routes (Add this with existing app.use)
+app.use('/api/order', orderRoutes);
 // Use Routes
 app.use('/api/menu', menuRoutes);
 app.use('/api/reservation', reservationRoutes);

@@ -86,6 +86,7 @@ function openMenu(evt, mealTime) {
                 <h3>${item.name}</h3>
                 <p>${item.desc}</p>
                 <span class="price-tag">₹${item.price}</span>
+                <button class="add-to-cart-btn" onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
             `;
             grid.appendChild(card);
         });
@@ -140,3 +141,100 @@ document.addEventListener("DOMContentLoaded", () => {
         openMenu({ currentTarget: firstTab }, 'Breakfast');
     }
 });
+// ==========================================
+// 🛒 DIGITAL WAITER / CART LOGIC
+// ==========================================
+let cart = [];
+
+function addToCart(name, price) {
+    // Check if item already in cart
+    const existingItem = cart.find(item => item.name === name);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ name, price, quantity: 1 });
+    }
+    updateCartUI();
+    
+    // Optional: Small alert or toast
+    alert(`Added ${name} to cart!`);
+}
+
+function updateCartUI() {
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const cartCount = document.getElementById('cart-count');
+    const totalAmountElem = document.getElementById('total-amount');
+    
+    cartItemsContainer.innerHTML = ''; // Clear current
+    let total = 0;
+    let count = 0;
+
+    cart.forEach((item, index) => {
+        total += (item.price * item.quantity);
+        count += item.quantity;
+        
+        cartItemsContainer.innerHTML += `
+            <div class="cart-item">
+                <span>${item.name} x ${item.quantity}</span>
+                <span>₹${item.price * item.quantity}</span>
+            </div>
+        `;
+    });
+
+    cartCount.innerText = count;
+    totalAmountElem.innerText = total;
+}
+
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+}
+
+async function placeOrder() {
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+    
+    const tableNumber = document.getElementById('table-number').value;
+    if (!tableNumber) {
+        alert("Please enter your table number!");
+        return;
+    }
+
+    const orderData = {
+        tableNumber: parseInt(tableNumber),
+        items: cart,
+        totalAmount: parseInt(document.getElementById('total-amount').innerText)
+    };
+
+    try {
+        const ORDER_API = 'https://restraunt-website-xeqg.onrender.com/api/order';
+        const response = await fetch(ORDER_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+
+        const message = document.getElementById('order-message');
+        if (response.ok) {
+            message.style.color = 'green';
+            message.innerText = "🍽️ Order sent to kitchen! Please wait at your table.";
+            // Clear cart
+            cart = [];
+            updateCartUI();
+            document.getElementById('table-number').value = '';
+            
+            // Auto close modal after 3 seconds
+            setTimeout(() => {
+                toggleCart();
+                message.innerText = '';
+            }, 3000);
+        } else {
+            message.style.color = 'red';
+            message.innerText = "Error placing order.";
+        }
+    } catch (error) {
+        console.error("Order error:", error);
+    }
+}
