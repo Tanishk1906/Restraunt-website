@@ -10,10 +10,9 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log("MongoDB Connected Successfully! 🚀"))
+// नया और सही कोड:
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected Successfully! 🚀"))
   .catch(err => console.log("DB Connection Error: ", err));
 
 // Routes import
