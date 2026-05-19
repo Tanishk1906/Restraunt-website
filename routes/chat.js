@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
         Your menu has: Breakfast (Poha Jalebi, Masala Dosa, Filter Coffee), Lunch (Paneer Tikka, Dum Biryani, Dal Makhani), Dinner (Kadhai Paneer, Jeera Rice), Special Thalis (Rajasthani Royal Thali).
         Keep answers short, friendly, and use emojis. Customer says: "${userMessage}"`;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(prompt);
         res.json({ reply: result.response.text() });
     } catch (error) {
