@@ -301,3 +301,61 @@ function toggleMobileMenu() {
         navLinks.style.boxShadow = '0 5px 10px rgba(0,0,0,0.1)';
     }
 }
+// ==========================================
+// 🤖 SMART AI WAITER LOGIC
+// ==========================================
+
+// चैट बॉक्स को खोलने और बंद करने का फंक्शन
+function toggleChat() {
+    const modal = document.getElementById('chat-modal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+}
+
+// AI से बात करने का मेन फंक्शन
+async function sendMessage() {
+    const inputField = document.getElementById('user-msg');
+    const message = inputField.value.trim();
+    if (!message) return; // अगर खाली मैसेज है तो कुछ मत करो
+
+    const chatBox = document.getElementById('chat-box');
+
+    // 1. ग्राहक का मैसेज स्क्रीन पर दिखाओ
+    chatBox.innerHTML += `<div class="message user-message">${message}</div>`;
+    inputField.value = ''; // इनपुट बॉक्स खाली करो
+    chatBox.scrollTop = chatBox.scrollHeight; // स्क्रॉल को सबसे नीचे रखो
+
+    // 2. थोड़ा "Typing..." वाला फील देने के लिए (Optional but looks cool)
+    const typingId = "typing-" + Date.now();
+    chatBox.innerHTML += `<div id="${typingId}" class="message ai-message">Thinking... 🤔</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        // 3. आपके Render Backend से AI का जवाब माँगो
+        const CHAT_API = 'https://restraunt-website-xeqg.onrender.com/api/chat';
+        const response = await fetch(CHAT_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+
+        // 4. "Thinking..." हटाकर असली जवाब दिखाओ
+        document.getElementById(typingId).remove();
+        chatBox.innerHTML += `<div class="message ai-message">${data.reply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+    } catch (error) {
+        console.error("Chat Error:", error);
+        document.getElementById(typingId).remove();
+        chatBox.innerHTML += `<div class="message ai-message">Sorry, internet is a bit slow! Try again. 😔</div>`;
+    }
+}
+
+// कीबोर्ड के 'Enter' बटन से भी मैसेज सेंड करने का शॉर्टकट
+document.getElementById("user-msg").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+    }
+});
