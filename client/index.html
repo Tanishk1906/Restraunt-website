@@ -28,11 +28,20 @@
 
     <!-- Menu Section -->
     <section id="menu" class="menu-section">
-        <h2>Our Menu</h2>
-        <div id="menu-container" class="menu-grid">
-            <!-- Menu items will be injected here via JavaScript -->
-            <p>Loading delicious items...</p>
+        <div class="menu-header">
+            <h2>Our Exquisite Menu</h2>
+            <p>Savor hand-crafted delicacies from morning to night</p>
         </div>
+
+        <div class="menu-tabs">
+            <button class="tab-btn active" onclick="openMenu(event, 'Breakfast')">🍳 Breakfast</button>
+            <button class="tab-btn" onclick="openMenu(event, 'Lunch')">🍛 Lunch</button>
+            <button class="tab-btn" onclick="openMenu(event, 'Dinner')">🍲 Dinner</button>
+            <button class="tab-btn" onclick="openMenu(event, 'Thali')">🍱 Special Thalis</button>
+        </div>
+
+        <div id="menu-content" class="menu-content-container">
+            </div>
     </section>
 
     <!-- Reservation Section -->
