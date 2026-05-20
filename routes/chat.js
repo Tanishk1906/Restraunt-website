@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
                 "X-Title": "Apna Dhaba" 
             },
             body: JSON.stringify({
-                "model": "google/gemini-flash-1.5",
+                "model": "google/gemini-flash-1.5-latest",
                 "messages": [
                     {
                         "role": "system", 
