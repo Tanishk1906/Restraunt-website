@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`, // यहाँ Key का नाम वही रखें जो Render में रखा है
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}``, // यहाँ Key का नाम वही रखें जो Render में रखा है
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
