@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "gpt-3.5-turbo", // या "gpt-4o" जो भी आपने प्लान लिया है
+                model: "openai/gpt-oss-120b:free", // या "gpt-4o" जो भी आपने प्लान लिया है
                 "messages": [
                     { "role": "system", "content": "You are a helpful waiter at Apna Dhaba." },
                     { "role": "user", "content": userMessage }
