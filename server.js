@@ -30,4 +30,7 @@ app.use('/api/order', orderRoutes);
 app.use('/api/chat', chatRoutes); // 👈 AI Chat Route
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT} 🍽️`));
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🍽️`); // Closing ) added here
+});
